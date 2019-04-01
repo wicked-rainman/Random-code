@@ -62,20 +62,44 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	strcpy(train,argv[1]);   //Save the train to local storage
-	if( (bool) (stock_position=valid_train_puller(train,train_length))) {    	//Is the front of the train correct ?
-		if((bool) (stock_position=valid_train_load(train,train_length, stock_position))) {  //Is load correct?
-			if (valid_train_end(train,train_length,stock_position)) { 	//Is the train end correct ?
+	
+	// ***************************************************************************
+	// Condition 1: Is the "train puller" (Engine or engin/tender combo) correct?
+	// ***************************************************************************
+	if( (bool) (stock_position=valid_train_puller(train,train_length))) {
+		// *************************************************************************
+		// Condition 2: Is the "train load" (Passengers or freight cars) correct ?
+		// *************************************************************************
+		if((bool) (stock_position=valid_train_load(train,train_length, stock_position))) {
+			// ************************************************************************
+			// Condition 3: Is the train end (Nothing, guards van, pusher Etc) correct?
+			// ************************************************************************
+			if (valid_train_end(train,train_length,stock_position)) {
+				// *****************************************************************
+				// Condition 1,2 and 3: True. It's a train!
+				// Front of train is okay, middle of train is okay and so is the end
+				// ******************************************************************
 				printf("Good train\n");	
 			}
 			else {
+				// ********************************************************
+				// Condition 3: False - Not going to be a train because the
+				// end is wrong
+				// ********************************************************
 				printf("Train end is wrong :%s\n",train);
 			}
 		}
 		else {
+			// ******************************************************************
+			// Condition 2: False - Not going to be a train because load is wrong
+			// ******************************************************************
 			printf("Train load looks wrong : %s\n",train);
 		}
 	}
 	else {
+		// ***************************************************
+		// Condition 1: False - Puller section of train wrong
+		// ***************************************************
 		printf("Train puller looks wrong: %s\n",train);
 	}
 	return 1;
@@ -92,12 +116,24 @@ int valid_train_puller(char *train, int train_length) {
 	bool engine=false;
 	int stock_position=0;
 	stock=toupper(train[stock_position]);
+	// ***********************************************************************
+	// Condition 4: While not end of train and stock is an engine or a tender
+	// ***********************************************************************
 	while((stock_position<train_length) && (stock==ENGINE || stock==TENDER)) {
+		// ****************************************
+		// Condition 5: If stock item is an engine
+		// ****************************************
 		if(stock==ENGINE) {
 			engine=true;
 			good_train=true;
 		}
+		// ****************************************
+		// Condition 6: If stock item is a tender
+		// ****************************************
 		if(stock==TENDER) {
+			// *********************************************
+			// Condition 7 : Is previous stock not an engine
+			// *********************************************
 			if(engine==false) {
                                 good_train=false;
 				break;
@@ -106,6 +142,10 @@ int valid_train_puller(char *train, int train_length) {
 		}
 		stock=toupper(train[++stock_position]);
 	}
+	// ********************************************************
+	// Condition 7: If good train puller return stock position
+	// as  true else return 0 as false
+	// ********************************************************
 	return good_train ? stock_position : 0;
 }
 
@@ -118,10 +158,17 @@ int valid_train_load(char *train, int train_length, int stock_position) {
 	char stock;
 	bool train_payload=false;
 	stock=toupper(train[stock_position]);
+	// ***************************************************************************
+	// Condition 8: while not end of train and stock is passenger or goods wagon
+	// ***************************************************************************
 	while((stock_position<train_length) && (stock==PASSENGER_CARRIDGE) || (stock==GOODS_WAGON)) {
 		train_payload=true;
 		stock=toupper(train[++stock_position]);
 	}
+	// **********************************************************************
+	// Condition 9 : If payload found return stock position as positive true
+	// else return 0 indicating false
+	// **********************************************************************
 	return train_payload ? stock_position : 0;
 }
 
