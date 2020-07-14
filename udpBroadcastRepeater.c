@@ -100,7 +100,6 @@ int main(int argc, char *argv[]) {
                 recvStringLen=-1;
                 /* Receive a single datagram from the server */
                 if((recvStringLen=read(UdpRxSock,recvString,MAXRECVSTRING))<0) {
-                //if ((recvStringLen = recvfrom(UdpRxSock, recvString, MAXRECVSTRING, 0, NULL, 0)) < 0) {
                         syslog(LOG_NOTICE,"Error reading UDP receive port\n");
                         exit(EXIT_FAILURE);
                 }
