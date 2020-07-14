@@ -2,7 +2,7 @@
 // Program: UdpReBroadcast
 // Reason:  This program accepts incomming UDP packets on port -i
 //          and sends them out as UDP broadcasts on port -o
-//          where the broadcast address is -a
+//          where the broadcast address is -b
 //          Maximum payload is MAXRECVSTRING.
 //          Broadcast output port is SO_REUSEPORT
 //
