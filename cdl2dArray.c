@@ -11,7 +11,8 @@
 //  load_array(100,5,ary[0],"Temperature,Humidity,Pressure,WindSpeed,Rainfall");
 //  Each array[n] gets comma delimited value "Temperature","Humidity"... Etc
 //
-// NOTE: Depends on function strpos
+// NOTES: Depends on function strpos
+//        prototype for this function is: void cdl2dArray(int, int, char*, char*);
 //
 //-----------------------------------------------------------------------------------
 void cdl2Array(int len, int fieldcount,char *ary ,char* fields) {
