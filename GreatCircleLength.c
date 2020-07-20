@@ -8,7 +8,6 @@ double GreatCircleLength(double lat1, double lon1, double lat2, double lon2) {
     dist = rad2deg(dist);
     dist = dist * 60 * 1.1515;
     return (dist);
-  }
 }
 
 double deg2rad(double deg) {
