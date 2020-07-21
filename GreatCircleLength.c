@@ -1,4 +1,8 @@
+//---------------------------------------------------------------
 //Calculate great circle length based on decimal lat lon pairs
+// (Open source code - not mine).
+// Needs to be linked with Maths library ( -lm)
+//---------------------------------------------------------------
 
 double GreatCircleLength(double lat1, double lon1, double lat2, double lon2) {
   double theta, dist;
