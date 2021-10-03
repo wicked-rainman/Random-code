@@ -1,0 +1,102 @@
+include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <ctype.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <signal.h>
+#define MAXRECVSTRING 100
+#define MAXFILENAMELEN 200
+void sigint_handler(int);
+char output_fname[MAXFILENAMELEN];
+FILE *fp;
+int main(int argc, char *argv[]) {
+        int UdpRxSock=-1;                       //Socket FD for UDP receive port
+        struct sockaddr_in recAddr;             //UDP receive socket
+        int RxPort=0;                           //Receive port number
+        int recvStringLen;                      //Length of received payload
+        char recvString[MAXRECVSTRING+1];       //UDP payload
+        int x,c;                                //Some old crap
+        memset(output_fname,0,100);
+        memset(recvString,0,MAXRECVSTRING);
+        signal(SIGINT, sigint_handler);
+        while((c=getopt(argc,argv,"p:o:")) !=-1) {
+                switch(c) {
+                        case 'p' : {
+                                RxPort = atoi(optarg);
+                                break;
+                        }
+                        case 'o' : {
+                                if(strlen(optarg)>MAXFILENAMELEN) {
+                                        fprintf(stderr,"Output file name too long! Writing to stdout.\n\n");
+                                        output_fname[0]='\0';
+                                }
+                                else {
+                                        strncpy(output_fname, optarg, sizeof(output_fname));
+                                        break;
+                                }
+                        }
+                        case 'h' : {
+                                fprintf(stderr,"Go to the doctors. I don't provide help!\n\n");
+                                exit(EXIT_FAILURE);
+                        }
+                        default : {
+                                fprintf(stderr,
+                                "Usage: %s -p <input port> -o <output file > \n\n",argv[0]);
+                                exit(EXIT_FAILURE);
+                        }
+                                   }
+        }
+        if(RxPort <= 0) {
+                fprintf(stderr,"No receive port specified!\n\n");
+                exit(EXIT_FAILURE);
+        }
+        if(output_fname[0] == '\0') fp=stdout;
+        else {
+                fp = fopen(output_fname,"a");
+                if(fp == NULL) {
+                        fprintf(stderr,"Warning: Could not open %s so writing to stdout.\n\n", output_fname);
+                        fp=stdout;
+                }
+        }
+        if ((UdpRxSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+                fprintf(stderr,"Could not open UDP receive socket\n");
+                (void) fclose(fp);
+                exit(EXIT_FAILURE);
+        }
+
+        memset(&recAddr, 0, sizeof(recAddr));
+        recAddr.sin_family = AF_INET;
+        recAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+        recAddr.sin_port = htons((uint16_t)RxPort);
+        if (bind(UdpRxSock, (struct sockaddr *) &recAddr, (socklen_t) sizeof(recAddr)) < 0) {
+                fprintf(stderr,"Could not bind UDP receive port\n");
+                exit(EXIT_FAILURE);
+        }
+        while(true) {
+                recvStringLen=-1;
+                /* Receive a single datagram from the server */
+                if((recvStringLen= (int) read(UdpRxSock,recvString,MAXRECVSTRING))<0) {
+                        fprintf(stderr,"Error reading UDP receive port\n");
+                        (void) fclose(fp);
+                        exit(EXIT_FAILURE);
+                }
+                else {
+                        recvString[recvStringLen]='\0';
+                        x=fprintf(fp,"%s",recvString);
+                        if(x<0) {
+                                fprintf(stderr,"Error writing to output file %s\n", output_fname);
+                                (void) fclose(fp);
+                                exit(EXIT_FAILURE);
+                        }
+                }
+        }
+}
+void sigint_handler(int sig) {
+        fprintf(stderr,"\nClosing output file \"%s\".\n", output_fname);
+        fclose(fp);
+        exit(EXIT_SUCCESS);
+}        
