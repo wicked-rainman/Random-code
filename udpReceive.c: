@@ -19,9 +19,9 @@
 #include <signal.h>
 #define MAXRECVSTRING 100
 #define MAXFILENAMELEN 200
-void sigint_handler(int);
+static void sigint_handler(int);
 char output_fname[MAXFILENAMELEN];
-FILE *fp;
+static FILE *fp;
 int main(int argc, char *argv[]) {
         int UdpRxSock=-1;                       //Socket FD for UDP receive port
         struct sockaddr_in recAddr;             //UDP receive socket
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         int x,c;                                //Some old crap
         memset(output_fname,0,100);
         memset(recvString,0,MAXRECVSTRING);
-        signal(SIGINT, sigint_handler);
+        (void) signal(SIGINT, sigint_handler);
         while((c=getopt(argc,argv,"p:o:")) !=-1) {
                 switch(c) {
                         case 'p' : {
@@ -106,11 +106,11 @@ int main(int argc, char *argv[]) {
                                 (void) fclose(fp);
                                 exit(EXIT_FAILURE);
                         }
-                        fflush(fp);
+                        (void) fflush(fp);
                 }
         }
 }
 void sigint_handler(int sig) {
         if(output_fname[0] !='\0') fprintf(stderr,"\nClosing output file \"%s\".\n", output_fname);
-        fclose(fp);
+        (void) fclose(fp);
         exit(EXIT_SUCCESS);
