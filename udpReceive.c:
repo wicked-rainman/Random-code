@@ -1,4 +1,13 @@
-include <stdio.h>
+//--------------------------------------------------------------------------------------
+//  udpReceive: Simple program to listen for and output a UDP payload
+//
+//  Parameters:
+//  -p The port number to listen on
+//  -o Optional output filename (defaults to stdout)
+//
+//---------------------------------------------------------------------------------------
+
+#include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <ctype.h>
@@ -31,6 +40,7 @@ int main(int argc, char *argv[]) {
                         }
                         case 'o' : {
                                 if(strlen(optarg)>MAXFILENAMELEN) {
+                                        //Don't allow stupidly long file names
                                         fprintf(stderr,"Output file name too long! Writing to stdout.\n\n");
                                         output_fname[0]='\0';
                                 }
@@ -39,7 +49,7 @@ int main(int argc, char *argv[]) {
                                         break;
                                 }
                         }
-                        case 'h' : {
+                        case 'h' : {                                
                                 fprintf(stderr,"Go to the doctors. I don't provide help!\n\n");
                                 exit(EXIT_FAILURE);
                         }
@@ -48,16 +58,19 @@ int main(int argc, char *argv[]) {
                                 "Usage: %s -p <input port> -o <output file > \n\n",argv[0]);
                                 exit(EXIT_FAILURE);
                         }
-                                   }
+                }
         }
         if(RxPort <= 0) {
+                //Don't allow stupid port numbers
                 fprintf(stderr,"No receive port specified!\n\n");
                 exit(EXIT_FAILURE);
         }
+        //If no output filename specified, write to stdout
         if(output_fname[0] == '\0') fp=stdout;
         else {
                 fp = fopen(output_fname,"a");
                 if(fp == NULL) {
+                        //If output file couldn't be opened, write to stdout
                         fprintf(stderr,"Warning: Could not open %s so writing to stdout.\n\n", output_fname);
                         fp=stdout;
                 }
@@ -76,12 +89,13 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr,"Could not bind UDP receive port\n");
                 exit(EXIT_FAILURE);
         }
+        //Loop forever waiting for packets, or break out through the signal handler
         while(true) {
                 recvStringLen=-1;
                 /* Receive a single datagram from the server */
                 if((recvStringLen= (int) read(UdpRxSock,recvString,MAXRECVSTRING))<0) {
                         fprintf(stderr,"Error reading UDP receive port\n");
-                        (void) fclose(fp);
+                        (void) fclose(fp);     
                         exit(EXIT_FAILURE);
                 }
                 else {
@@ -92,11 +106,11 @@ int main(int argc, char *argv[]) {
                                 (void) fclose(fp);
                                 exit(EXIT_FAILURE);
                         }
+                        fflush(fp);
                 }
         }
 }
 void sigint_handler(int sig) {
-        fprintf(stderr,"\nClosing output file \"%s\".\n", output_fname);
+        if(output_fname[0] !='\0') fprintf(stderr,"\nClosing output file \"%s\".\n", output_fname);
         fclose(fp);
         exit(EXIT_SUCCESS);
-}        
