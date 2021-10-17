@@ -4,6 +4,7 @@
 //  Parameters:
 //  -p The port number to listen on
 //  -o Optional output filename (defaults to stdout)
+//  -n Optional. Add Newline character to end of each output line.
 //
 //---------------------------------------------------------------------------------------
 
@@ -28,11 +29,12 @@ int main(int argc, char *argv[]) {
         int RxPort=0;                           //Receive port number
         int recvStringLen;                      //Length of received payload
         char recvString[MAXRECVSTRING+1];       //UDP payload
-        int x,c;                                //Some old crap
+        int x,c,n;                              //Some old crap
         memset(output_fname,0,100);
         memset(recvString,0,MAXRECVSTRING);
+        n=0;
         (void) signal(SIGINT, sigint_handler);
-        while((c=getopt(argc,argv,"p:o:")) !=-1) {
+        while((c=getopt(argc,argv,"hnp:o:")) !=-1) {
                 switch(c) {
                         case 'p' : {
                                 RxPort = atoi(optarg);
@@ -52,6 +54,10 @@ int main(int argc, char *argv[]) {
                         case 'h' : {                                
                                 fprintf(stderr,"Go to the doctors. I don't provide help!\n\n");
                                 exit(EXIT_FAILURE);
+                        }
+                        case 'n' : {
+                                n=1;
+                                break;
                         }
                         default : {
                                 fprintf(stderr,
@@ -100,7 +106,8 @@ int main(int argc, char *argv[]) {
                 }
                 else {
                         recvString[recvStringLen]='\0';
-                        x=fprintf(fp,"%s",recvString);
+                        if(n==0) x=fprintf(fp,"%s",recvString)
+                        else x=fprintf(fp,"%s\n",recvString);
                         if(x<0) {
                                 fprintf(stderr,"Error writing to output file %s\n", output_fname);
                                 (void) fclose(fp);
