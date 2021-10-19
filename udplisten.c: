@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-//  udpReceive: Simple program to listen for and output a UDP payload
+//  udplisten: Simple program to listen for and output a UDP payload
 //
 //  Parameters:
 //  -p The port number to listen on
