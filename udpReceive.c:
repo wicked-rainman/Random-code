@@ -121,3 +121,4 @@ void sigint_handler(int sig) {
         if(output_fname[0] !='\0') fprintf(stderr,"\nClosing output file \"%s\".\n", output_fname);
         (void) fclose(fp);
         exit(EXIT_SUCCESS);
+}
