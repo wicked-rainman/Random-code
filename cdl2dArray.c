@@ -8,7 +8,7 @@
 //  Fourth parameter is the comma delimited string.
 //
 //  Given char ary[5][100];
-//  load_array(100,5,ary[0],"Temperature,Humidity,Pressure,WindSpeed,Rainfall");
+//  cdl2Array(100,5,ary[0],"Temperature,Humidity,Pressure,WindSpeed,Rainfall");
 //  Each array[n] gets comma delimited value "Temperature","Humidity"... Etc
 //
 // NOTES: Depends on function strpos
