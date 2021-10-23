@@ -9,7 +9,8 @@
 //
 //  Given char ary[5][100];
 //  cdl2Array(100,5,ary[0],"Temperature,Humidity,Pressure,WindSpeed,Rainfall");
-//  Each array[n] gets comma delimited value "Temperature","Humidity"... Etc
+//  Each array[n] gets the comma delimited values out of fields 
+//  for "Temperature","Humidity"... Etc
 //
 // NOTES: Depends on function strpos
 //        prototype for this function is: void cdl2dArray(int, int, char*, char*);
