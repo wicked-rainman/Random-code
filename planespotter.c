@@ -1,4 +1,46 @@
 //---------------------------------------------------------------------------------------------------------
+// Purpose:
+// Program to listen to dump1090-fa output port 30003 using ncat then reads that data in via pipe.
+// Reads a file of hex idents for planes that are of interest,
+// Records when any one plane was first seen, then outputs a record to a log file when
+// the plane goes out of range.
+// When the plane has departed the area, message also sent via pushover.net
+// Wanted plane details (hex ident and description) are held in a linklist.
+// When the plane departs, it's linklist entry is zero'd out.
+//
+// Run as a system service:
+// [Unit]
+// Description=Local plane spotting  service
+// After=mariadb.service
+// Requires=network.target
+// [Service]
+// Type=idle
+// ExecStart=/usr/local/sbin/spotplanes.sh 
+// Restart=always
+// RestartSec=60
+// [Install]
+// WantedBy=multi-user.target
+// 
+// and this is the shell script:
+// #!/bin/bash
+// /usr/bin/ncat 127.0.0.1 30003 | /usr/local/bin/planespot -i /usr/local/share/PlaneIdents.txt -o /var/log/planes.log
+//
+// This is typical format/content of the -i (ident) file:
+//
+// 43C5EE Airbus A400M Atlas C1
+// 407685 Airbus EC-145 (Helicopter)
+// 43C5DE Airbus A-400M 
+// 43C5E1 Airbus A-400M 
+// 43C6F8 Airbus Voyager KC3 
+// 43C6B8 Boeing C-17 Globemaster
+// 43C5DB Airbus A400M Atlas
+// 43C5DF Airbus A-400M 
+// 4076C3 AUTOGYRO Cavalon 
+// 43C92C AIRBUS HELICOPTERS EC-145 
+// 406D67 Alisport Silent 
+// 43C8F6 AIRBUS HELICOPTERS EC-135/635 
+// 407279 ROBINSON R-44 Raven
+// 43C174 C-17 Globemaster 3
 //
 // dump1090-fa port 30003 data format:
 //
